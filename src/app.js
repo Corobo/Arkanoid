@@ -8,6 +8,7 @@ var GameLayer = cc.Layer.extend({
     spriteBarra:null,
     keyPulsada: null,
     arrayBloques:[],
+    arrayTnts:[],
     ctor:function () {
         this._super();
         var size = cc.winSize;
@@ -163,6 +164,27 @@ var GameLayer = cc.Layer.extend({
                 this.arrayBloques.splice(i, 1);
                 console.log("Quedan : "+this.arrayBloques.length);
                 destruido = true;
+                for(var j=0; j< this.arrayTnts.length; j++){
+                    if(this.arrayTnts[j]==i){
+                        if(i-1>=0){
+                            this.removeChild(this.arrayBloques[i-1]);
+                            this.arrayBloques.splice(i-1, 1);
+                        }
+                        if(i+1<this.arrayBloques.length){
+                            this.removeChild(this.arrayBloques[i+1]);
+                            this.arrayBloques.splice(i+1, 1);
+                        }
+                        if(i-19>=0){
+                            this.removeChild(this.arrayBloques[i-19]);
+                            this.arrayBloques.splice(i-19, 1);
+                        }
+                        if(i+19<this.arrayBloques.length){
+                            this.removeChild(this.arrayBloques[i+19]);
+                            this.arrayBloques.splice(i+19, 1);
+                        }
+                    }
+                    console.log("Quedan : "+this.arrayBloques.length);
+                }
                 //Ampliacion niveles
                 if(this.arrayBloques.length==0){
                     nivelActual++;
@@ -200,42 +222,51 @@ var GameLayer = cc.Layer.extend({
             var fila = 0;
             var columna = 0;
             var constanteAumento = 5;
+            var framesBloqueCocodrilo = [];
+            var framesBloquePanda = [];
+            var framesBloqueTigre = [];
+             for (var i = 1; i <= 8; i++) {
+                var strCocodrilo = "cocodrilo" + i + ".png";
+                var strPanda = "panda" + i + ".png";
+                var strTigre = "tigre" + i + ".png";
+                var framesCocodrilo = cc.spriteFrameCache.getSpriteFrame(strCocodrilo);
+                var framesPanda = cc.spriteFrameCache.getSpriteFrame(strPanda);
+                var framesTigre = cc.spriteFrameCache.getSpriteFrame(strTigre);
+                framesBloqueCocodrilo.push(framesCocodrilo);
+                framesBloquePanda.push(framesPanda);
+                framesBloqueTigre.push(framesTigre);
+             }
 
-            while (insertados < nivel*constanteAumento){
-                //Ampliacion
-                var modelo = Math.floor((Math.random() * 3) + 1);
-                //Frames bloque ^^ fuera
-                var framesBloque = [];
-                 for (var i = 1; i <= 8; i++) {
-                    if(modelo==1)
-                        var str = "cocodrilo" + i + ".png";
-                    if(modelo==2)
-                        var str = "panda" + i + ".png";
-                    if(modelo==3)
-                        var str = "tigre" + i + ".png";
-                    var frame = cc.spriteFrameCache.getSpriteFrame(str);
-                    framesBloque.push(frame);
-                 }
-                var animacionBloque = new cc.Animation(framesBloque, 0.1);
-                var accionAnimacionBloque =
-                          new cc.RepeatForever(new cc.Animate(animacionBloque));
-                //Cargar sprite
-                //var spriteBloqueActual = new cc.Sprite("#cocodrilo1.png");
-                //spriteBloqueActual.runAction(accionAnimacionBloque);
+            while (insertados < 50){
+                var modelo = Math.floor((Math.random() * 4) + 1);
+
                 //Ampliacion bloques diferentes
                 switch (modelo) {
                     case 1:
+                        var animacionBloque = new cc.Animation(framesBloqueCocodrilo, 0.1);
+                        var accionAnimacionBloque =
+                                  new cc.RepeatForever(new cc.Animate(animacionBloque));
                         var spriteBloqueActual = new cc.Sprite("#cocodrilo1.png");
                         break;
                     case 2:
+                        var animacionBloque = new cc.Animation(framesBloquePanda, 0.1);
+                        var accionAnimacionBloque =
+                                  new cc.RepeatForever(new cc.Animate(animacionBloque));
                         var spriteBloqueActual = new cc.Sprite("#panda1.png");
                         break;
                     case 3:
+                        var animacionBloque = new cc.Animation(framesBloqueTigre, 0.1);
+                        var accionAnimacionBloque =
+                                  new cc.RepeatForever(new cc.Animate(animacionBloque));
                         var spriteBloqueActual = new cc.Sprite("#tigre1.png");
+                    case 4:
+                        var spriteBloqueActual = cc.Sprite.create(res.tnt);
+                        this.arrayTnts[i]=insertados;
+                        i++;
                         break;
                 }
-
-                spriteBloqueActual.runAction(accionAnimacionBloque);
+                if(modelo!=4)
+                    spriteBloqueActual.runAction(accionAnimacionBloque);
 
 
                 var x = ( spriteBloqueActual.width / 2 ) +
