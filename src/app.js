@@ -1,5 +1,6 @@
 
 var nivelActual = 1;
+var enemigosFila = [];
 
 var GameLayer = cc.Layer.extend({
     spritePelota:null,
@@ -9,6 +10,7 @@ var GameLayer = cc.Layer.extend({
     keyPulsada: null,
     arrayBloques:[],
     arrayTnts:[],
+    enemigosFila:[],
     ctor:function () {
         this._super();
         var size = cc.winSize;
@@ -166,22 +168,7 @@ var GameLayer = cc.Layer.extend({
                 destruido = true;
                 for(var j=0; j< this.arrayTnts.length; j++){
                     if(this.arrayTnts[j]==i){
-                        if(i-1>=0){
-                            this.removeChild(this.arrayBloques[i-1]);
-                            this.arrayBloques.splice(i-1, 1);
-                        }
-                        if(i+1<this.arrayBloques.length){
-                            this.removeChild(this.arrayBloques[i+1]);
-                            this.arrayBloques.splice(i+1, 1);
-                        }
-                        if(i-19>=0){
-                            this.removeChild(this.arrayBloques[i-19]);
-                            this.arrayBloques.splice(i-19, 1);
-                        }
-                        if(i+19<this.arrayBloques.length){
-                            this.removeChild(this.arrayBloques[i+19]);
-                            this.arrayBloques.splice(i+19, 1);
-                        }
+
                     }
                     console.log("Quedan : "+this.arrayBloques.length);
                 }
@@ -236,7 +223,7 @@ var GameLayer = cc.Layer.extend({
                 framesBloquePanda.push(framesPanda);
                 framesBloqueTigre.push(framesTigre);
              }
-
+            var tnt = 0;
             while (insertados < 50){
                 var modelo = Math.floor((Math.random() * 4) + 1);
 
@@ -261,8 +248,8 @@ var GameLayer = cc.Layer.extend({
                         var spriteBloqueActual = new cc.Sprite("#tigre1.png");
                     case 4:
                         var spriteBloqueActual = cc.Sprite.create(res.tnt);
-                        this.arrayTnts[i]=insertados;
-                        i++;
+                        this.arrayTnts[tnt]=columna;
+                        tnt++;
                         break;
                 }
                 if(modelo!=4)
@@ -284,8 +271,10 @@ var GameLayer = cc.Layer.extend({
                 columna++;
 
                 if( x + spriteBloqueActual.width / 2 > cc.winSize.width){
+                  enemigosFila [fila] = columna;
                   columna = 0;
                   fila++;
+
                 }
             }
        }
