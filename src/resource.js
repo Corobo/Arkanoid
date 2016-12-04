@@ -22,7 +22,9 @@ var res = {
         sonidobucle_wav : "res/sonidobucle.wav",
         animacion_bola_png : "res/animacion_bola.png",
         animacion_bola_plist : "res/animacion_bola.plist",
-        tnt : "res/tnt.png"
+        tnt : "res/tnt.png",
+        power_up: "res/powerup.png",
+        power_down: "res/powerdown.png"
 };
 
 var g_resources = [];

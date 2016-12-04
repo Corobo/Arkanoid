@@ -9,6 +9,9 @@ var GameLayer = cc.Layer.extend({
     keyPulsada: null,
     arrayBloques:[],
     arrayTnts:[],
+    arrayPowerUp:[],
+    arrayPowerDown:[],
+    sizePlataforma:1,
     ctor:function () {
         this._super();
         var size = cc.winSize;
@@ -195,6 +198,52 @@ var GameLayer = cc.Layer.extend({
                 this.arrayBloques.splice(lugar,1);
                 }
             }
+            for(var i=0; i<this.arrayPowerUp.length;i++){
+                var powerUp = this.arrayPowerUp[i];
+                if(bloqueDestruido.x==powerUp.x && bloqueDestruido.y==powerUp.y){
+                   if(this.sizePlataforma==1){
+                        var xBarra = this.spriteBarra.x + this.velocidadX;
+                        var yBarra = this.spriteBarra.y + this.velocidadY;
+                        this.removeChild(this.spriteBarra);
+                        this.spriteBarra = cc.Sprite.create(res.barra_3_png);
+                        this.spriteBarra.setPosition(cc.p(xBarra , yBarra ));
+                        this.addChild(this.spriteBarra);
+                        this.sizePlataforma=2;
+                    }
+                    if(this.sizePlataforma==0){
+                        var xBarra = this.spriteBarra.x + this.velocidadX;
+                        var yBarra = this.spriteBarra.y + this.velocidadY;
+                        this.removeChild(this.spriteBarra);
+                        this.spriteBarra = cc.Sprite.create(res.barra_2_png);
+                        this.spriteBarra.setPosition(cc.p(xBarra , yBarra ));
+                        this.addChild(this.spriteBarra);
+                        this.sizePlataforma=1;
+                    }
+                }
+            }
+            for(var i=0; i<this.arrayPowerDown.length;i++){
+                var powerDown = this.arrayPowerDown[i];
+                if(bloqueDestruido.x==powerDown.x && bloqueDestruido.y==powerDown.y){
+                   if(this.sizePlataforma==1){
+                       var xBarra = this.spriteBarra.x + this.velocidadX;
+                       var yBarra = this.spriteBarra.y + this.velocidadY;
+                       this.removeChild(this.spriteBarra);
+                       this.spriteBarra = cc.Sprite.create(res.barra_1_png);
+                       this.spriteBarra.setPosition(cc.p(xBarra , yBarra ));
+                       this.addChild(this.spriteBarra);
+                       this.sizePlataforma=0;
+                   }
+                   if(this.sizePlataforma==2){
+                       var xBarra = this.spriteBarra.x + this.velocidadX;
+                       var yBarra = this.spriteBarra.y + this.velocidadY;
+                       this.removeChild(this.spriteBarra);
+                       this.spriteBarra = cc.Sprite.create(res.barra_2_png);
+                       this.spriteBarra.setPosition(cc.p(xBarra , yBarra ));
+                       this.addChild(this.spriteBarra);
+                      this.sizePlataforma=1;
+                   }
+                }
+            }
         }
 
         //Ampliacion niveles
@@ -226,6 +275,7 @@ var GameLayer = cc.Layer.extend({
     },inicializarBloques:function(nivel) {
             this.arrayBloques =[];
             this.arrayTnts = [];
+            this.arrayPowerUp = [];
             var insertados = 0;
             var fila = 0;
             var columna = 0;
@@ -245,7 +295,7 @@ var GameLayer = cc.Layer.extend({
                 framesBloqueTigre.push(framesTigre);
              }
             while (insertados < nivel*constanteAumento){
-                var modelo = Math.floor((Math.random() * 4) + 1);
+                var modelo = Math.floor((Math.random() * 6) + 1);
 
                 //Ampliacion bloques diferentes
                 switch (modelo) {
@@ -269,8 +319,14 @@ var GameLayer = cc.Layer.extend({
                     case 4:
                         var spriteBloqueActual = cc.Sprite.create(res.tnt);
                         break;
+                    case 5:
+                        var spriteBloqueActual = cc.Sprite.create(res.power_up);
+                        break;
+                    case 6:
+                        var spriteBloqueActual = cc.Sprite.create(res.power_down);
+                        break;
                 }
-                if(modelo!=4)
+                if(modelo!=4 && modelo!=5 && modelo!=6)
                     spriteBloqueActual.runAction(accionAnimacionBloque);
 
 
@@ -285,6 +341,10 @@ var GameLayer = cc.Layer.extend({
                 this.arrayBloques.push(spriteBloqueActual);
                 if(modelo==4)
                     this.arrayTnts.push(spriteBloqueActual);
+                if(modelo==5)
+                    this.arrayPowerUp.push(spriteBloqueActual);
+                if(modelo==6)
+                    this.arrayPowerDown.push(spriteBloqueActual);
                 this.addChild(spriteBloqueActual);
 
                 insertados++;
