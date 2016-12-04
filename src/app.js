@@ -1,6 +1,5 @@
 
 var nivelActual = 1;
-var enemigosFila = [];
 
 var GameLayer = cc.Layer.extend({
     spritePelota:null,
@@ -10,7 +9,6 @@ var GameLayer = cc.Layer.extend({
     keyPulsada: null,
     arrayBloques:[],
     arrayTnts:[],
-    enemigosFila:[],
     ctor:function () {
         this._super();
         var size = cc.winSize;
@@ -26,11 +24,6 @@ var GameLayer = cc.Layer.extend({
         this.spriteBarra = cc.Sprite.create(res.barra_2_png);
         this.spriteBarra.setPosition(cc.p(size.width/2 , size.height*0.1 ));
         this.addChild(this.spriteBarra);
-        //Creacion sprite bloque
-        //this.spriteBloque = cc.Sprite.create(res.cocodrilo_1_png);
-        //this.spriteBloque.setPosition(cc.p(this.spriteBloque.width/2 ,
-        //      size.height - this.spriteBloque.height/2 ));
-        //this.addChild(this.spriteBloque);
         //Creacion del fondo
         var spriteFondo = cc.Sprite.create(res.fondo_png);
         spriteFondo.setPosition(cc.p(size.width/2 , size.height/2));
@@ -48,11 +41,6 @@ var GameLayer = cc.Layer.extend({
         //Creacion de los bloques
         this.inicializarBloques(nivelActual);
 
-        //var actionMoverPelota = cc.MoveTo.create(1, cc.p(size.width, size.height));
-        //this.spritePelota.runAction(actionMoverPelota);
-
-        //var actionMoverPelota = cc.MoveBy.create(1, cc.p(100, 0));
-        //this.spritePelota.runAction(actionMoverPelota);
 
         var actionMoverPelota1 = cc.MoveBy.create(1, cc.p(100, 0));
         var actionMoverPelota2 = cc.MoveBy.create(1, cc.p(0, 100));
@@ -114,15 +102,10 @@ var GameLayer = cc.Layer.extend({
             // Ambito procesarMouseDown
             var instancia = event.getCurrentTarget(); // para coger objetos de otro ambito
 
-            alert("Pulsado ");
             console.log(event.getLocationX());
             console.log(event.getLocationY());
 
-            var actionMoverPelotaAPunto =
-                cc.MoveTo.create(1,
-                        cc.p(event.getLocationX(),
-                        event.getLocationY()));
-            //Eliminar acciones previas
+
             cc.director.getActionManager().removeAllActionsFromTarget(instancia.spriteBarra, true);
             var actionMoverBarraX =
                 cc.MoveTo.create(Math.abs(instancia.spriteBarra.x -
@@ -150,39 +133,75 @@ var GameLayer = cc.Layer.extend({
             this.velocidadY =  this.velocidadY*-1;
         }
 
-        //Calcular colision bloque
-        //var areaBloque = this.spriteBloque.getBoundingBox();
-        //if( cc.rectIntersectsRect(areaPelota, areaBloque)){
-          //  console.log("Colision");
-            //this.removeChild(this.spriteBloque);
-        //}
-
         //Calcular colisiones bloques
         var destruido = false;
+        var bloqueDestruido;
         for(var i = 0; i < this.arrayBloques.length; i++){
              var areaBloque = this.arrayBloques[i].getBoundingBox();
              if( cc.rectIntersectsRect(areaPelota, areaBloque)){
+                bloqueDestruido = this.arrayBloques[i];
                 this.removeChild(this.arrayBloques[i]);
                 this.arrayBloques.splice(i, 1);
                 console.log("Quedan : "+this.arrayBloques.length);
                 destruido = true;
-                for(var j=0; j< this.arrayTnts.length; j++){
-                    if(this.arrayTnts[j]==i){
-
-                    }
-                    console.log("Quedan : "+this.arrayBloques.length);
-                }
-                //Ampliacion niveles
-                if(this.arrayBloques.length==0){
-                    nivelActual++;
-                    cc.director.pause();
-                    this.addChild(new GameWinLayer());
-                }
              }
         }
+        var aDestruir = [];
         if(destruido){
             this.velocidadX = this.velocidadX*-1;
             this.velocidadY = this.velocidadY*-1;
+            var it=0;
+            for(var i=0;i<this.arrayTnts.length;i++){
+                var tnt = this.arrayTnts[i];
+                if(tnt.x == bloqueDestruido.x && tnt.y==bloqueDestruido.y){
+                    for(var j=0; j<this.arrayBloques.length;j++){
+                        if(this.arrayBloques[j].x==tnt.x-40 && this.arrayBloques[j].y==tnt.y-40){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x && this.arrayBloques[j].y==tnt.y-40){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x+40 && this.arrayBloques[j].y==tnt.y-40){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x-40 && this.arrayBloques[j].y==tnt.y){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x+40 && this.arrayBloques[j].y==tnt.y){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x-40 && this.arrayBloques[j].y==tnt.y+40){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x && this.arrayBloques[j].y==tnt.y+40){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                        if(this.arrayBloques[j].x==tnt.x+40 && this.arrayBloques[j].y==tnt.y+40){
+                            aDestruir[it]=this.arrayBloques[j]; it++;
+                            }
+                    }
+                }
+            }
+            for(var i=0;i<aDestruir.length;i++){
+                var lugar=-1;
+                var bloqueADestruir = aDestruir[i];
+                for(var j = 0 ; j<this.arrayBloques.length;j++){
+                    var bloqueBuscado = this.arrayBloques[j];
+                    if(bloqueADestruir.x == bloqueBuscado.x  && bloqueADestruir.y == bloqueBuscado.y)
+                        lugar=j;
+               }
+               if(lugar!=-1){
+                this.removeChild(this.arrayBloques[lugar]);
+                this.arrayBloques.splice(lugar,1);
+                }
+            }
+        }
+
+        //Ampliacion niveles
+        if(this.arrayBloques.length==0){
+            nivelActual++;
+            cc.director.pause();
+            this.addChild(new GameWinLayer());
         }
 
         // Rebote
@@ -205,6 +224,8 @@ var GameLayer = cc.Layer.extend({
              this.velocidadY = this.velocidadY*-1;
         }
     },inicializarBloques:function(nivel) {
+            this.arrayBloques =[];
+            this.arrayTnts = [];
             var insertados = 0;
             var fila = 0;
             var columna = 0;
@@ -223,8 +244,7 @@ var GameLayer = cc.Layer.extend({
                 framesBloquePanda.push(framesPanda);
                 framesBloqueTigre.push(framesTigre);
              }
-            var tnt = 0;
-            while (insertados < 50){
+            while (insertados < nivel*constanteAumento){
                 var modelo = Math.floor((Math.random() * 4) + 1);
 
                 //Ampliacion bloques diferentes
@@ -248,8 +268,6 @@ var GameLayer = cc.Layer.extend({
                         var spriteBloqueActual = new cc.Sprite("#tigre1.png");
                     case 4:
                         var spriteBloqueActual = cc.Sprite.create(res.tnt);
-                        this.arrayTnts[tnt]=columna;
-                        tnt++;
                         break;
                 }
                 if(modelo!=4)
@@ -265,13 +283,14 @@ var GameLayer = cc.Layer.extend({
                 spriteBloqueActual.setPosition(cc.p(x,y));
 
                 this.arrayBloques.push(spriteBloqueActual);
+                if(modelo==4)
+                    this.arrayTnts.push(spriteBloqueActual);
                 this.addChild(spriteBloqueActual);
 
                 insertados++;
                 columna++;
 
                 if( x + spriteBloqueActual.width / 2 > cc.winSize.width){
-                  enemigosFila [fila] = columna;
                   columna = 0;
                   fila++;
 
